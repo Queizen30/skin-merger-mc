@@ -736,7 +736,7 @@
                             throw new Error(`Profile API error: ${response.status}`);
                         }
                         const data = await response.json();
-                        if (data.properties && Array.isArray(data.properties)) {
+                        if (data.properties && Array.isArray(data.properties) && data.properties.length > 0) {
                             const textureProperty = data.properties.find(p => p.name === 'textures');
                             if (textureProperty) {
                                 const textureData = JSON.parse(atob(textureProperty.value));
@@ -852,6 +852,7 @@
             const errorMsg = lastError?.message || 'Unknown error';
             
             // Check if username was not found in multiple APIs
+            // Use Math.ceil to ensure at least 1 API must report "not found" even with small API counts
             // If more than the threshold of APIs report "not found", the username likely doesn't exist
             const notFoundErrors = errors.filter(e => {
                 const errorLower = e.error.toLowerCase();
