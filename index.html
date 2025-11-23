@@ -712,17 +712,17 @@
             const apis = [
                 {
                     name: 'mc-heads.net',
-                    getUrl: async (username) => `https://mc-heads.net/skin/${encodeURIComponent(username)}`,
+                    getUrl: (username) => `https://mc-heads.net/skin/${encodeURIComponent(username)}`,
                     timeout: 5000
                 },
                 {
                     name: 'Crafatar',
-                    getUrl: async (username) => `https://crafatar.com/skins/${encodeURIComponent(username)}`,
+                    getUrl: (username) => `https://crafatar.com/skins/${encodeURIComponent(username)}`,
                     timeout: 5000
                 },
                 {
                     name: 'Minotar',
-                    getUrl: async (username) => `https://minotar.net/skin/${encodeURIComponent(username)}`,
+                    getUrl: (username) => `https://minotar.net/skin/${encodeURIComponent(username)}`,
                     timeout: 5000
                 },
                 {
@@ -854,8 +854,9 @@
             const errorMsg = lastError?.message || 'Unknown error';
             
             // Check if username was not found in multiple APIs
-            // Use Math.round to determine threshold (e.g., 5 APIs * 0.6 = 3 APIs minimum = 60%)
-            // This ensures we need a clear majority before concluding username doesn't exist
+            // Use Math.ceil to ensure consistent percentage threshold across different API counts
+            // With 5 APIs and 0.6 threshold: ceil(3.0) = 3 APIs needed (60%)
+            // With 4 APIs and 0.6 threshold: ceil(2.4) = 3 APIs needed (75%)
             const notFoundErrors = errors.filter(e => {
                 const errorLower = e.error.toLowerCase();
                 return errorLower.includes('404') || 
@@ -863,7 +864,7 @@
                        errorLower.includes('no skin');
             });
             
-            const notFoundThreshold = Math.round(apis.length * NOT_FOUND_THRESHOLD);
+            const notFoundThreshold = Math.ceil(apis.length * NOT_FOUND_THRESHOLD);
             if (notFoundErrors.length >= notFoundThreshold) {
                 throw new Error(`Username "${username}" not found. Please verify the username exists.`);
             }
