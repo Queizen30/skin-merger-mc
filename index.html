@@ -681,18 +681,21 @@
         
         // Helper function to add timeout to fetch requests
         function fetchWithTimeout(url, timeout = 5000) {
+            let timeoutId;
+            const timeoutPromise = new Promise((_, reject) => {
+                timeoutId = setTimeout(() => reject(new Error('Request timeout')), timeout);
+            });
+            
             return Promise.race([
-                fetch(url),
-                new Promise((_, reject) => 
-                    setTimeout(() => reject(new Error('Request timeout')), timeout)
-                )
+                fetch(url).finally(() => clearTimeout(timeoutId)),
+                timeoutPromise
             ]);
         }
 
         // Validate username format
         function isValidUsername(username) {
-            // Minecraft usernames are 3-16 characters, alphanumeric and underscores
-            return /^[a-zA-Z0-9_]{3,16}$/.test(username);
+            // Minecraft usernames: 3-16 characters, start with alphanumeric, then alphanumeric or underscore
+            return /^[a-zA-Z0-9][a-zA-Z0-9_]{2,15}$/.test(username);
         }
 
         // Get skin by username with fallback APIs
@@ -733,7 +736,7 @@
                             throw new Error(`Profile API error: ${response.status}`);
                         }
                         const data = await response.json();
-                        if (data.properties) {
+                        if (data.properties && Array.isArray(data.properties)) {
                             const textureProperty = data.properties.find(p => p.name === 'textures');
                             if (textureProperty) {
                                 const textureData = JSON.parse(atob(textureProperty.value));
@@ -850,23 +853,25 @@
             
             // Check if username was not found in multiple APIs
             // If more than the threshold of APIs report "not found", the username likely doesn't exist
-            const notFoundErrors = errors.filter(e => 
-                e.error.includes('404') || 
-                e.error.includes('not found') || 
-                e.error.includes('No skin')
-            );
+            const notFoundErrors = errors.filter(e => {
+                const errorLower = e.error.toLowerCase();
+                return errorLower.includes('404') || 
+                       errorLower.includes('not found') || 
+                       errorLower.includes('no skin');
+            });
             
             if (notFoundErrors.length >= Math.ceil(apis.length * NOT_FOUND_THRESHOLD)) {
                 throw new Error(`Username "${username}" not found. Please verify the username exists.`);
             }
             
             // Check for CORS/network issues
-            const corsErrors = errors.filter(e => 
-                e.error.includes('CORS') || 
-                e.error.includes('blocked') ||
-                e.error.includes('network') ||
-                e.error.includes('timeout')
-            );
+            const corsErrors = errors.filter(e => {
+                const errorLower = e.error.toLowerCase();
+                return errorLower.includes('cors') || 
+                       errorLower.includes('blocked') ||
+                       errorLower.includes('network') ||
+                       errorLower.includes('timeout');
+            });
             
             if (corsErrors.length === errors.length) {
                 throw new Error(`Unable to fetch skin for "${username}" due to network/CORS issues. Try uploading the skin file directly.`);
