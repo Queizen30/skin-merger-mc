@@ -458,57 +458,107 @@
         let rightSkinImg = null;
         let mergedSkinUrl = null;
 
-        // Compressed coordinate ranges
+        // Complete Minecraft skin coordinate mapping
+        
+        // SKIN 1 (Right side perspective) - NORMAL LAYER
         const skin1_normal = [
-            // Head top right (12-15;0-7) and bottom right (20-23;0-7)
-            {x: [12,15], y: [0,7]}, {x: [20,23], y: [0,7]},
-            // Head front right (12-15;8-15) and sides (16-27;8-15)
-            {x: [12,15], y: [8,15]}, {x: [16,27], y: [8,15]},
-            // Body top right (24-27;16-19) and (32-35;16-19)
-            {x: [24,27], y: [16,19]}, {x: [32,35], y: [16,19]},
-            // Body front/back right (24-35;20-31)
-            {x: [24,35], y: [20,31]},
-            // Right leg overlay area (20-27;48-51) and (36-43;48-51)
-            {x: [20,27], y: [48,51]}, {x: [36,43], y: [48,51]},
-            // Full right leg (16-47;52-63)
-            {x: [16,47], y: [52,63]}
+            // Head regions
+            {x: [12,15], y: [0,7]},   // Head (Top Right)
+            {x: [20,23], y: [0,7]},   // Head (Bottom Right)
+            {x: [12,15], y: [8,15]},  // Head (Front Right)
+            {x: [16,27], y: [8,15]},  // Head (Left + Back + Right sides)
+            
+            // Body regions
+            {x: [24,27], y: [16,19]}, // Body (Top Right)
+            {x: [32,35], y: [16,19]}, // Body (Top additional)
+            {x: [24,35], y: [20,31]}, // Body (Front/Back Right)
+            
+            // Right arm regions
+            {x: [44,47], y: [20,31]}, // Right Arm (Right side)
+            {x: [48,51], y: [20,31]}, // Right Arm (Front)
+            {x: [52,55], y: [20,31]}, // Right Arm (Left side)
+            {x: [56,59], y: [20,31]}, // Right Arm (Back)
+            
+            // Right leg regions
+            {x: [20,27], y: [48,51]}, // Right Leg (Top overlay area)
+            {x: [36,43], y: [48,51]}, // Right Leg (Additional top area)
+            {x: [16,47], y: [52,63]}  // Right Leg (Full)
         ];
 
+        // SKIN 2 (Left side perspective) - NORMAL LAYER
         const skin2_normal = [
-            // Head top left (8-11;0-7) and bottom left (16-19;0-7)
-            {x: [8,11], y: [0,7]}, {x: [16,19], y: [0,7]},
-            // Head front left (8-11;8-15) and sides (0-7;8-15), (28-31;8-15)
-            {x: [8,11], y: [8,15]}, {x: [0,7], y: [8,15]}, {x: [28,31], y: [8,15]},
-            // Body top left (4-11;16-19), (20-23;16-19), (44-51;16-19)
-            {x: [4,11], y: [16,19]}, {x: [20,23], y: [16,19]}, {x: [44,51], y: [16,19]},
-            // Body front/back left (0-23;20-31) and (36-55;20-31)
-            {x: [0,23], y: [20,31]}, {x: [36,55], y: [20,31]}
+            // Head regions
+            {x: [8,11], y: [0,7]},    // Head (Top Left)
+            {x: [16,19], y: [0,7]},   // Head (Bottom Left)
+            {x: [8,11], y: [8,15]},   // Head (Front Left)
+            {x: [0,7], y: [8,15]},    // Head (Right Side)
+            {x: [28,31], y: [8,15]},  // Head (Left Side)
+            
+            // Body regions
+            {x: [4,11], y: [16,19]},  // Body (Top Left)
+            {x: [20,23], y: [16,19]}, // Body (Top center)
+            {x: [44,51], y: [16,19]}, // Body (Top right)
+            {x: [0,23], y: [20,31]},  // Body (Front/Back Left)
+            {x: [36,55], y: [20,31]}, // Body (Additional Front/Back)
+            
+            // Left arm regions
+            {x: [40,43], y: [20,31]}, // Left Arm (Front)
+            {x: [36,39], y: [20,31]}, // Left Arm (Right side)
+            {x: [32,35], y: [20,31]}, // Left Arm (Left side)
+            {x: [60,63], y: [20,31]}, // Left Arm (Back)
+            
+            // Left leg regions (normal layer)
+            {x: [4,7], y: [20,31]},   // Left Leg (Right side)
+            {x: [8,11], y: [20,31]},  // Left Leg (Front)
+            {x: [12,15], y: [20,31]}, // Left Leg (Left side)
+            {x: [0,3], y: [20,31]}    // Left Leg (Back)
         ];
 
+        // SKIN 1 - OVERLAY LAYER (Second layer/accessories)
         const skin1_layer = [
-            // Head overlay top right (44-47;0-7) and (52-55;0-7)
-            {x: [44,47], y: [0,7]}, {x: [52,55], y: [0,7]},
-            // Head overlay front/sides right (44-59;8-15)
-            {x: [44,59], y: [8,15]},
-            // Body overlay top right (24-27;32-35) and (32-35;32-35)
-            {x: [24,27], y: [32,35]}, {x: [32,35], y: [32,35]},
-            // Body overlay front/back right (24-35;36-47)
-            {x: [24,35], y: [36,47]},
-            // Left leg overlay (4-11;48-51) and (52-59;48-51)
-            {x: [4,11], y: [48,51]}, {x: [52,59], y: [48,51]},
-            // Full left leg overlay (0-15;52-63) and (48-63;52-63)
-            {x: [0,15], y: [52,63]}, {x: [48,63], y: [52,63]}
+            // Head overlay
+            {x: [44,47], y: [0,7]},   // Head Accessory (Top Right)
+            {x: [52,55], y: [0,7]},   // Head Accessory (Bottom Right)
+            {x: [44,59], y: [8,15]},  // Head Accessory (Front/Sides Right)
+            
+            // Body overlay
+            {x: [24,27], y: [32,35]}, // Body Accessory (Top Right)
+            {x: [32,35], y: [32,35]}, // Body Accessory (Top additional)
+            {x: [24,35], y: [36,47]}, // Body Accessory (Front/Back Right)
+            
+            // Right arm overlay
+            {x: [44,47], y: [36,47]}, // Right Arm Accessory (Right side)
+            {x: [48,51], y: [36,47]}, // Right Arm Accessory (Front)
+            {x: [52,55], y: [36,47]}, // Right Arm Accessory (Left side)
+            {x: [56,59], y: [36,47]}, // Right Arm Accessory (Back)
+            
+            // Left leg overlay
+            {x: [4,11], y: [48,51]},  // Left Leg Accessory (Top)
+            {x: [52,59], y: [48,51]}, // Left Leg Accessory (Additional top)
+            {x: [0,15], y: [52,63]},  // Left Leg Accessory (Full left)
+            {x: [48,63], y: [52,63]}  // Left Leg Accessory (Full right)
         ];
 
+        // SKIN 2 - OVERLAY LAYER (Second layer/accessories)
         const skin2_layer = [
-            // Head overlay top left (40-43;0-7) and (48-51;0-7)
-            {x: [40,43], y: [0,7]}, {x: [48,51], y: [0,7]},
-            // Head overlay front/sides left (32-43;8-15) and (60-63;8-15)
-            {x: [32,43], y: [8,15]}, {x: [60,63], y: [8,15]},
-            // Body overlay top left (4-11;32-35), (20-23;32-35), (44-51;32-35)
-            {x: [4,11], y: [32,35]}, {x: [20,23], y: [32,35]}, {x: [44,51], y: [32,35]},
-            // Body overlay front/back left (0-23;36-47) and (36-55;36-47)
-            {x: [0,23], y: [36,47]}, {x: [36,55], y: [36,47]}
+            // Head overlay
+            {x: [40,43], y: [0,7]},   // Head Accessory (Top Left)
+            {x: [48,51], y: [0,7]},   // Head Accessory (Bottom Left)
+            {x: [32,43], y: [8,15]},  // Head Accessory (Front/Sides Left)
+            {x: [60,63], y: [8,15]},  // Head Accessory (Back Left)
+            
+            // Body overlay
+            {x: [4,11], y: [32,35]},  // Body Accessory (Top Left)
+            {x: [20,23], y: [32,35]}, // Body Accessory (Top center)
+            {x: [44,51], y: [32,35]}, // Body Accessory (Top right)
+            {x: [0,23], y: [36,47]},  // Body Accessory (Front/Back Left)
+            {x: [36,55], y: [36,47]}, // Body Accessory (Additional Front/Back)
+            
+            // Left arm overlay
+            {x: [40,43], y: [36,47]}, // Left Arm Accessory (Front)
+            {x: [36,39], y: [36,47]}, // Left Arm Accessory (Right side)
+            {x: [32,35], y: [36,47]}, // Left Arm Accessory (Left side)
+            {x: [60,63], y: [36,47]}  // Left Arm Accessory (Back)
         ];
 
         // Event listeners
