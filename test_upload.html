@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+<head><title>File Upload Test</title></head>
+<body>
+<h1>Testing File Upload Directly</h1>
+<input type="file" id="testFile" accept=".png">
+<div id="result"></div>
+<script>
+document.getElementById('testFile').addEventListener('change', async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    
+    const reader = new FileReader();
+    reader.onload = (event) => {
+        const img = new Image();
+        img.onload = () => {
+            document.getElementById('result').innerHTML = 
+                `Loaded: ${file.name}<br>Size: ${img.width}x${img.height}px`;
+        };
+        img.src = event.target.result;
+    };
+    reader.readAsDataURL(file);
+});
+</script>
+</body>
+</html>
