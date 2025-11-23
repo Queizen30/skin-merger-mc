@@ -718,15 +718,6 @@
                     timeout: 5000
                 },
                 {
-                    name: 'MineSkin',
-                    getUrl: async (username) => {
-                        // MineSkin doesn't have a direct username endpoint, skip for now
-                        // Could be enhanced to resolve UUID first, then fetch skin
-                        throw new Error('MineSkin requires UUID - not implemented for username lookup');
-                    },
-                    timeout: 5000
-                },
-                {
                     name: 'Minotar',
                     getUrl: async (username) => `https://minotar.net/skin/${encodeURIComponent(username)}`,
                     timeout: 5000
@@ -824,14 +815,13 @@
                     
                     // Load the image with timeout and proper cleanup
                     let timeoutId;
+                    const timeoutPromise = new Promise((_, reject) => {
+                        timeoutId = setTimeout(() => reject(new Error('Image load timeout')), api.timeout || 5000);
+                    });
+                    
                     const img = await Promise.race([
-                        loadImage(skinUrl).then(img => {
-                            clearTimeout(timeoutId);
-                            return img;
-                        }),
-                        new Promise((_, reject) => {
-                            timeoutId = setTimeout(() => reject(new Error('Image load timeout')), api.timeout || 5000);
-                        })
+                        loadImage(skinUrl).finally(() => clearTimeout(timeoutId)),
+                        timeoutPromise
                     ]);
                     
                     const elapsed = Date.now() - startTime;
@@ -859,7 +849,7 @@
                 e.error.includes('No skin')
             );
             
-            if (notFoundErrors.length >= apis.length / 2) {
+            if (notFoundErrors.length >= Math.ceil(apis.length / 2)) {
                 throw new Error(`Username "${username}" not found. Please verify the username exists.`);
             }
             
