@@ -266,11 +266,13 @@
             margin: 0 auto 8px;
             display: block;
             box-shadow: var(--shadow-sm);
+            background: #e5e5e5; /* Fallback for older browsers */
             background: repeating-conic-gradient(#cccccc 0% 25%, #ffffff 0% 50%) 50% / 20px 20px;
             border: 2px solid var(--border-color);
         }
 
         [data-theme="dark"] .skin-canvas {
+            background: #1a1a1a; /* Fallback for older browsers */
             background: repeating-conic-gradient(#2d3748 0% 25%, #1a202c 0% 50%) 50% / 20px 20px;
         }
 
@@ -633,28 +635,44 @@
                 {
                     name: 'Mojang',
                     getUrl: async (username) => {
-                        // First get UUID from Mojang API
-                        const uuidResponse = await fetch(`https://api.mojang.com/users/profiles/minecraft/${encodeURIComponent(username)}`);
-                        if (!uuidResponse.ok) {
-                            if (uuidResponse.status === 404) {
-                                throw new Error('Username not found');
+                        try {
+                            // First get UUID from Mojang API
+                            const uuidResponse = await fetch(`https://api.mojang.com/users/profiles/minecraft/${encodeURIComponent(username)}`);
+                            if (!uuidResponse.ok) {
+                                if (uuidResponse.status === 404) {
+                                    throw new Error('Username not found');
+                                }
+                                throw new Error('Mojang API error');
                             }
-                            throw new Error('Mojang API error');
+                            const uuidData = await uuidResponse.json();
+                            
+                            // Then get profile data
+                            const profileResponse = await fetch(`https://sessionserver.mojang.com/session/minecraft/profile/${uuidData.id}`);
+                            if (!profileResponse.ok) throw new Error('Profile fetch failed');
+                            const profileData = await profileResponse.json();
+                            
+                            // Decode texture data with error handling
+                            const textureProperty = profileData.properties.find(p => p.name === 'textures');
+                            if (!textureProperty) throw new Error('No texture data');
+                            
+                            let textureData;
+                            try {
+                                textureData = JSON.parse(atob(textureProperty.value));
+                            } catch (e) {
+                                throw new Error('Invalid texture data format');
+                            }
+                            
+                            if (!textureData.textures || !textureData.textures.SKIN) {
+                                throw new Error('No skin texture');
+                            }
+                            return textureData.textures.SKIN.url;
+                        } catch (error) {
+                            // Handle CORS and network errors
+                            if (error.message.includes('CORS') || error.name === 'TypeError') {
+                                throw new Error('API blocked by CORS policy');
+                            }
+                            throw error;
                         }
-                        const uuidData = await uuidResponse.json();
-                        
-                        // Then get profile data
-                        const profileResponse = await fetch(`https://sessionserver.mojang.com/session/minecraft/profile/${uuidData.id}`);
-                        if (!profileResponse.ok) throw new Error('Profile fetch failed');
-                        const profileData = await profileResponse.json();
-                        
-                        // Decode texture data
-                        const textureProperty = profileData.properties.find(p => p.name === 'textures');
-                        if (!textureProperty) throw new Error('No texture data');
-                        const textureData = JSON.parse(atob(textureProperty.value));
-                        
-                        if (!textureData.textures.SKIN) throw new Error('No skin texture');
-                        return textureData.textures.SKIN.url;
                     }
                 },
                 {
@@ -671,13 +689,7 @@
 
             for (const api of apis) {
                 try {
-                    let skinUrl;
-                    if (typeof api.getUrl === 'function') {
-                        skinUrl = await api.getUrl(username);
-                    } else {
-                        skinUrl = api.getUrl;
-                    }
-
+                    const skinUrl = await api.getUrl(username);
                     const img = await loadImage(skinUrl);
                     return img;
                 } catch (error) {
