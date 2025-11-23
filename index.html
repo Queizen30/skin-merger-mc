@@ -805,6 +805,7 @@
 
             let lastError = null;
             const errors = [];
+            const NOT_FOUND_THRESHOLD = 0.5; // If >50% of APIs report not found, username likely doesn't exist
 
             for (const api of apis) {
                 try {
@@ -819,14 +820,20 @@
                         timeoutId = setTimeout(() => reject(new Error('Image load timeout')), api.timeout || 5000);
                     });
                     
-                    const img = await Promise.race([
-                        loadImage(skinUrl).finally(() => clearTimeout(timeoutId)),
-                        timeoutPromise
-                    ]);
-                    
-                    const elapsed = Date.now() - startTime;
-                    console.log(`[Skin Fetch] ✓ Success with ${api.name} (${elapsed}ms)`);
-                    return img;
+                    try {
+                        const img = await Promise.race([
+                            loadImage(skinUrl),
+                            timeoutPromise
+                        ]);
+                        clearTimeout(timeoutId);
+                        
+                        const elapsed = Date.now() - startTime;
+                        console.log(`[Skin Fetch] ✓ Success with ${api.name} (${elapsed}ms)`);
+                        return img;
+                    } catch (error) {
+                        clearTimeout(timeoutId);
+                        throw error;
+                    }
                 } catch (error) {
                     lastError = error;
                     const errorMsg = error.message || 'Unknown error';
@@ -842,14 +849,14 @@
             const errorMsg = lastError?.message || 'Unknown error';
             
             // Check if username was not found in multiple APIs
-            // If more than half of the APIs report "not found", the username likely doesn't exist
+            // If more than the threshold of APIs report "not found", the username likely doesn't exist
             const notFoundErrors = errors.filter(e => 
                 e.error.includes('404') || 
                 e.error.includes('not found') || 
                 e.error.includes('No skin')
             );
             
-            if (notFoundErrors.length >= Math.ceil(apis.length / 2)) {
+            if (notFoundErrors.length >= Math.ceil(apis.length * NOT_FOUND_THRESHOLD)) {
                 throw new Error(`Username "${username}" not found. Please verify the username exists.`);
             }
             
