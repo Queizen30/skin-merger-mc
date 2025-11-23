@@ -5,63 +5,22 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Minecraft Skin Merger - Working</title>
     <style>
-        :root {
-            --bg-primary: #ffffff;
-            --bg-secondary: #f7fafc;
-            --bg-input: #ffffff;
-            --text-primary: #1a202c;
-            --text-secondary: #718096;
-            --text-muted: #a0aec0;
-            --border-color: #e2e8f0;
-            --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.1);
-            --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.15);
-            --btn-primary: #48bb78;
-            --btn-primary-hover: #38a169;
-            --btn-secondary: #4299e1;
-            --btn-secondary-hover: #3182ce;
-            --btn-tertiary: #ed8936;
-            --btn-tertiary-hover: #dd7723;
-            --btn-disabled: #cbd5e0;
-        }
-
-        [data-theme="dark"] {
-            --bg-primary: #1a202c;
-            --bg-secondary: #2d3748;
-            --bg-input: #2d3748;
-            --text-primary: #f7fafc;
-            --text-secondary: #cbd5e0;
-            --text-muted: #718096;
-            --border-color: #4a5568;
-            --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.3);
-            --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.4);
-            --btn-disabled: #4a5568;
-        }
-
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
-
-        body {
-            background: var(--bg-primary);
-            color: var(--text-primary);
-            transition: background-color 0.3s ease, color 0.3s ease;
-            min-height: 100vh;
-        }
         
         .container {
             max-width: 1200px;
             margin: 0 auto;
-            padding: 0 20px;
         }
 
         header {
             text-align: center;
             padding: 20px 0;
             margin-bottom: 20px;
-            position: relative;
         }
 
         h1 {
@@ -69,107 +28,28 @@
             margin-bottom: 8px;
         }
 
-        .subtitle {
-            color: var(--text-secondary);
-        }
-
-        .theme-toggle {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            background: var(--bg-secondary);
-            border: 2px solid var(--border-color);
-            border-radius: 50px;
-            padding: 8px 16px;
-            cursor: pointer;
-            font-size: 1.2rem;
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .theme-toggle:hover {
-            transform: scale(1.05);
-            box-shadow: var(--shadow-sm);
-        }
-
         .input-section {
-            background: var(--bg-secondary);
             border-radius: 12px;
             padding: 20px;
             margin-bottom: 20px;
-            box-shadow: var(--shadow-md);
-            border: 1px solid var(--border-color);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
         }
 
         .input-group {
             margin-bottom: 15px;
         }
 
-        .input-dual {
-            display: grid;
-            grid-template-columns: 1fr auto;
-            gap: 10px;
-            align-items: end;
-        }
-
         label {
             display: block;
             margin-bottom: 6px;
             font-weight: 600;
-            color: var(--text-primary);
         }
 
-        .label-secondary {
-            font-size: 0.85rem;
-            color: var(--text-muted);
-            font-weight: normal;
-            margin-top: 4px;
-        }
-
-        input[type="text"], input[type="file"] {
+        input[type="text"] {
             width: 100%;
             padding: 10px 12px;
             border-radius: 6px;
             font-size: 1rem;
-            background: var(--bg-input);
-            color: var(--text-primary);
-            border: 2px solid var(--border-color);
-            transition: border-color 0.2s ease;
-        }
-
-        input[type="text"]:focus, input[type="file"]:focus {
-            outline: none;
-            border-color: var(--btn-secondary);
-        }
-
-        input[type="file"] {
-            padding: 8px 12px;
-            cursor: pointer;
-        }
-
-        input[type="file"]::file-selector-button {
-            background: var(--btn-secondary);
-            color: white;
-            border: none;
-            padding: 6px 12px;
-            border-radius: 4px;
-            cursor: pointer;
-            margin-right: 10px;
-            font-weight: 600;
-        }
-
-        input[type="file"]::file-selector-button:hover {
-            background: var(--btn-secondary-hover);
-        }
-
-        .or-divider {
-            text-align: center;
-            color: var(--text-muted);
-            font-size: 0.9rem;
-            margin: 10px 0;
-            font-weight: 500;
         }
 
         .button-group {
@@ -186,57 +66,45 @@
             border-radius: 20px;
             font-size: 1rem;
             font-weight: 600;
-            border: none;
-            cursor: pointer;
-            transition: all 0.2s ease;
         }
 
         #fetchButton {
-            background: var(--btn-primary);
+            background: #48bb78;
             color: white;
         }
 
-        #fetchButton:hover:not(:disabled) {
-            background: var(--btn-primary-hover);
-            transform: translateY(-2px);
-            box-shadow: var(--shadow-sm);
+        #fetchButton:hover {
+            background: #38a169;
         }
 
         #mergeButton {
-            background: var(--btn-secondary);
+            background: #4299e1;
             color: white;
         }
 
-        #mergeButton:hover:not(:disabled) {
-            background: var(--btn-secondary-hover);
-            transform: translateY(-2px);
-            box-shadow: var(--shadow-sm);
+        #mergeButton:hover {
+            background: #3182ce;
         }
 
         #downloadButton {
-            background: var(--btn-tertiary);
+            background: #ed8936;
             color: white;
         }
 
-        #downloadButton:hover:not(:disabled) {
-            background: var(--btn-tertiary-hover);
-            transform: translateY(-2px);
-            box-shadow: var(--shadow-sm);
+        #downloadButton:hover {
+            background: #dd7723;
         }
 
         button:disabled {
-            background: var(--btn-disabled);
+            background: #4a5568;
             cursor: not-allowed;
             opacity: 0.6;
-            transform: none !important;
         }
 
         .preview-section {
-            background: var(--bg-secondary);
             border-radius: 20px;
             padding: 20px;
-            box-shadow: var(--shadow-md);
-            border: 1px solid var(--border-color);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
         }
 
         .preview-title {
@@ -265,22 +133,14 @@
             border-radius: 8px;
             margin: 0 auto 8px;
             display: block;
-            box-shadow: var(--shadow-sm);
-            background: #e5e5e5; /* Fallback for older browsers */
-            background: repeating-conic-gradient(#cccccc 0% 25%, #ffffff 0% 50%) 50% / 20px 20px;
-            border: 2px solid var(--border-color);
-        }
-
-        [data-theme="dark"] .skin-canvas {
-            background: #1a1a1a; /* Fallback for older browsers */
-            background: repeating-conic-gradient(#2d3748 0% 25%, #1a202c 0% 50%) 50% / 20px 20px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
         }
 
         .skin-status {
             font-size: 0.85rem;
             min-height: 18px;
             margin-top: 4px;
-            color: var(--text-muted);
+            color: #a0aec0;
         }
 
         .message-area {
@@ -289,61 +149,24 @@
             border-radius: 6px;
             text-align: center;
             font-weight: 500;
-            display: none;
-        }
-
-        .message-area.show {
-            display: block;
         }
 
         .loading {
             background: rgba(66, 153, 225, 0.2);
             border-left: 4px solid #4299e1;
-            color: #4299e1;
+            color: #90cdf4;
         }
 
         .error {
             background: rgba(245, 101, 101, 0.2);
             border-left: 4px solid #f56565;
-            color: #f56565;
+            color: #fc8181;
         }
 
         .success {
             background: rgba(72, 187, 120, 0.2);
             border-left: 4px solid #48bb78;
-            color: #48bb78;
-        }
-
-        .spinner {
-            display: inline-block;
-            width: 14px;
-            height: 14px;
-            border: 2px solid rgba(255, 255, 255, 0.3);
-            border-top-color: white;
-            border-radius: 50%;
-            animation: spin 0.8s linear infinite;
-            margin-right: 8px;
-            vertical-align: middle;
-        }
-
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-
-        @media (max-width: 768px) {
-            .skin-previews {
-                grid-template-columns: 1fr;
-            }
-
-            .theme-toggle {
-                position: static;
-                margin: 10px auto;
-                width: fit-content;
-            }
-
-            header {
-                padding-top: 10px;
-            }
+            color: #9ae6b4;
         }
     </style>
 </head>
@@ -352,34 +175,21 @@
         <header>
             <h1>Minecraft Skin Merger</h1>
             <p class="subtitle">by  Queizen30</p>
-            <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
-                <span id="themeIcon">🌙</span>
-            </button>
         </header>
 
         <div class="input-section">
             <div class="input-group">
-                <label for="username1">
-                    First Skin (Skin 1):
-                    <span class="label-secondary">Enter username or upload file</span>
-                </label>
+                <label for="username1">First Username (Skin 1):</label>
                 <input type="text" id="username1" placeholder="Enter Minecraft username">
-                <div class="or-divider">OR</div>
-                <input type="file" id="file1" accept=".png,image/png">
             </div>
             
             <div class="input-group">
-                <label for="username2">
-                    Second Skin (Skin 2):
-                    <span class="label-secondary">Enter username or upload file</span>
-                </label>
+                <label for="username2">Second Username (Skin 2):</label>
                 <input type="text" id="username2" placeholder="Enter Minecraft username">
-                <div class="or-divider">OR</div>
-                <input type="file" id="file2" accept=".png,image/png">
             </div>
             
             <div class="button-group">
-                <button id="fetchButton">Load Skins</button>
+                <button id="fetchButton">Fetch Skins</button>
                 <button id="mergeButton" disabled>Merge Skins</button>
                 <button id="downloadButton" disabled>Download</button>
             </div>
@@ -413,33 +223,9 @@
     </div>
 
     <script>
-        // Theme management
-        const themeToggle = document.getElementById('themeToggle');
-        const themeIcon = document.getElementById('themeIcon');
-        const htmlElement = document.documentElement;
-
-        // Load saved theme or default to light
-        const savedTheme = localStorage.getItem('theme') || 'light';
-        htmlElement.setAttribute('data-theme', savedTheme);
-        updateThemeIcon(savedTheme);
-
-        themeToggle.addEventListener('click', () => {
-            const currentTheme = htmlElement.getAttribute('data-theme');
-            const newTheme = currentTheme === 'light' ? 'dark' : 'light';
-            htmlElement.setAttribute('data-theme', newTheme);
-            localStorage.setItem('theme', newTheme);
-            updateThemeIcon(newTheme);
-        });
-
-        function updateThemeIcon(theme) {
-            themeIcon.textContent = theme === 'light' ? '🌙' : '☀️';
-        }
-
         // DOM elements
         const username1Input = document.getElementById('username1');
         const username2Input = document.getElementById('username2');
-        const file1Input = document.getElementById('file1');
-        const file2Input = document.getElementById('file2');
         const fetchButton = document.getElementById('fetchButton');
         const mergeButton = document.getElementById('mergeButton');
         const downloadButton = document.getElementById('downloadButton');
@@ -458,305 +244,112 @@
         let rightSkinImg = null;
         let mergedSkinUrl = null;
 
-        // Complete Minecraft skin coordinate mapping
-        
-        // SKIN 1 (Right side perspective) - NORMAL LAYER
+        // Compressed coordinate ranges
         const skin1_normal = [
-            // Head regions
-            {x: [12,15], y: [0,7]},   // Head (Top Right)
-            {x: [20,23], y: [0,7]},   // Head (Bottom Right)
-            {x: [12,15], y: [8,15]},  // Head (Front Right)
-            {x: [16,27], y: [8,15]},  // Head (Left + Back + Right sides)
-            
-            // Body regions
-            {x: [24,27], y: [16,19]}, // Body (Top Right)
-            {x: [32,35], y: [16,19]}, // Body (Top additional)
-            {x: [24,35], y: [20,31]}, // Body (Front/Back Right)
-            
-            // Right arm regions
-            {x: [44,47], y: [20,31]}, // Right Arm (Right side)
-            {x: [48,51], y: [20,31]}, // Right Arm (Front)
-            {x: [52,55], y: [20,31]}, // Right Arm (Left side)
-            {x: [56,59], y: [20,31]}, // Right Arm (Back)
-            
-            // Right leg regions
-            {x: [20,27], y: [48,51]}, // Right Leg (Top overlay area)
-            {x: [36,43], y: [48,51]}, // Right Leg (Additional top area)
-            {x: [16,47], y: [52,63]}  // Right Leg (Full)
+            // Head top right (12-15;0-7) and bottom right (20-23;0-7)
+            {x: [12,15], y: [0,7]}, {x: [20,23], y: [0,7]},
+            // Head front right (12-15;8-15) and sides (16-27;8-15)
+            {x: [12,15], y: [8,15]}, {x: [16,27], y: [8,15]},
+            // Body top right (24-27;16-19) and (32-35;16-19)
+            {x: [24,27], y: [16,19]}, {x: [32,35], y: [16,19]},
+            // Body front/back right (24-35;20-31)
+            {x: [24,35], y: [20,31]},
+            // Right leg overlay area (20-27;48-51) and (36-43;48-51)
+            {x: [20,27], y: [48,51]}, {x: [36,43], y: [48,51]},
+            // Full right leg (16-47;52-63)
+            {x: [16,47], y: [52,63]}
         ];
 
-        // SKIN 2 (Left side perspective) - NORMAL LAYER
         const skin2_normal = [
-            // Head regions
-            {x: [8,11], y: [0,7]},    // Head (Top Left)
-            {x: [16,19], y: [0,7]},   // Head (Bottom Left)
-            {x: [8,11], y: [8,15]},   // Head (Front Left)
-            {x: [0,7], y: [8,15]},    // Head (Right Side)
-            {x: [28,31], y: [8,15]},  // Head (Left Side)
-            
-            // Body regions
-            {x: [4,11], y: [16,19]},  // Body (Top Left)
-            {x: [20,23], y: [16,19]}, // Body (Top center)
-            {x: [44,51], y: [16,19]}, // Body (Top right)
-            {x: [0,23], y: [20,31]},  // Body (Front/Back Left)
-            {x: [36,55], y: [20,31]}, // Body (Additional Front/Back)
-            
-            // Left arm regions
-            {x: [40,43], y: [20,31]}, // Left Arm (Front)
-            {x: [36,39], y: [20,31]}, // Left Arm (Right side)
-            {x: [32,35], y: [20,31]}, // Left Arm (Left side)
-            {x: [60,63], y: [20,31]}, // Left Arm (Back)
-            
-            // Left leg regions (normal layer)
-            {x: [4,7], y: [20,31]},   // Left Leg (Right side)
-            {x: [8,11], y: [20,31]},  // Left Leg (Front)
-            {x: [12,15], y: [20,31]}, // Left Leg (Left side)
-            {x: [0,3], y: [20,31]}    // Left Leg (Back)
+            // Head top left (8-11;0-7) and bottom left (16-19;0-7)
+            {x: [8,11], y: [0,7]}, {x: [16,19], y: [0,7]},
+            // Head front left (8-11;8-15) and sides (0-7;8-15), (28-31;8-15)
+            {x: [8,11], y: [8,15]}, {x: [0,7], y: [8,15]}, {x: [28,31], y: [8,15]},
+            // Body top left (4-11;16-19), (20-23;16-19), (44-51;16-19)
+            {x: [4,11], y: [16,19]}, {x: [20,23], y: [16,19]}, {x: [44,51], y: [16,19]},
+            // Body front/back left (0-23;20-31) and (36-55;20-31)
+            {x: [0,23], y: [20,31]}, {x: [36,55], y: [20,31]}
         ];
 
-        // SKIN 1 - OVERLAY LAYER (Second layer/accessories)
         const skin1_layer = [
-            // Head overlay
-            {x: [44,47], y: [0,7]},   // Head Accessory (Top Right)
-            {x: [52,55], y: [0,7]},   // Head Accessory (Bottom Right)
-            {x: [44,59], y: [8,15]},  // Head Accessory (Front/Sides Right)
-            
-            // Body overlay
-            {x: [24,27], y: [32,35]}, // Body Accessory (Top Right)
-            {x: [32,35], y: [32,35]}, // Body Accessory (Top additional)
-            {x: [24,35], y: [36,47]}, // Body Accessory (Front/Back Right)
-            
-            // Right arm overlay
-            {x: [44,47], y: [36,47]}, // Right Arm Accessory (Right side)
-            {x: [48,51], y: [36,47]}, // Right Arm Accessory (Front)
-            {x: [52,55], y: [36,47]}, // Right Arm Accessory (Left side)
-            {x: [56,59], y: [36,47]}, // Right Arm Accessory (Back)
-            
-            // Left leg overlay
-            {x: [4,11], y: [48,51]},  // Left Leg Accessory (Top)
-            {x: [52,59], y: [48,51]}, // Left Leg Accessory (Additional top)
-            {x: [0,15], y: [52,63]},  // Left Leg Accessory (Full left)
-            {x: [48,63], y: [52,63]}  // Left Leg Accessory (Full right)
+            // Head overlay top right (44-47;0-7) and (52-55;0-7)
+            {x: [44,47], y: [0,7]}, {x: [52,55], y: [0,7]},
+            // Head overlay front/sides right (44-59;8-15)
+            {x: [44,59], y: [8,15]},
+            // Body overlay top right (24-27;32-35) and (32-35;32-35)
+            {x: [24,27], y: [32,35]}, {x: [32,35], y: [32,35]},
+            // Body overlay front/back right (24-35;36-47)
+            {x: [24,35], y: [36,47]},
+            // Left leg overlay (4-11;48-51) and (52-59;48-51)
+            {x: [4,11], y: [48,51]}, {x: [52,59], y: [48,51]},
+            // Full left leg overlay (0-15;52-63) and (48-63;52-63)
+            {x: [0,15], y: [52,63]}, {x: [48,63], y: [52,63]}
         ];
 
-        // SKIN 2 - OVERLAY LAYER (Second layer/accessories)
         const skin2_layer = [
-            // Head overlay
-            {x: [40,43], y: [0,7]},   // Head Accessory (Top Left)
-            {x: [48,51], y: [0,7]},   // Head Accessory (Bottom Left)
-            {x: [32,43], y: [8,15]},  // Head Accessory (Front/Sides Left)
-            {x: [60,63], y: [8,15]},  // Head Accessory (Back Left)
-            
-            // Body overlay
-            {x: [4,11], y: [32,35]},  // Body Accessory (Top Left)
-            {x: [20,23], y: [32,35]}, // Body Accessory (Top center)
-            {x: [44,51], y: [32,35]}, // Body Accessory (Top right)
-            {x: [0,23], y: [36,47]},  // Body Accessory (Front/Back Left)
-            {x: [36,55], y: [36,47]}, // Body Accessory (Additional Front/Back)
-            
-            // Left arm overlay
-            {x: [40,43], y: [36,47]}, // Left Arm Accessory (Front)
-            {x: [36,39], y: [36,47]}, // Left Arm Accessory (Right side)
-            {x: [32,35], y: [36,47]}, // Left Arm Accessory (Left side)
-            {x: [60,63], y: [36,47]}  // Left Arm Accessory (Back)
+            // Head overlay top left (40-43;0-7) and (48-51;0-7)
+            {x: [40,43], y: [0,7]}, {x: [48,51], y: [0,7]},
+            // Head overlay front/sides left (32-43;8-15) and (60-63;8-15)
+            {x: [32,43], y: [8,15]}, {x: [60,63], y: [8,15]},
+            // Body overlay top left (4-11;32-35), (20-23;32-35), (44-51;32-35)
+            {x: [4,11], y: [32,35]}, {x: [20,23], y: [32,35]}, {x: [44,51], y: [32,35]},
+            // Body overlay front/back left (0-23;36-47) and (36-55;36-47)
+            {x: [0,23], y: [36,47]}, {x: [36,55], y: [36,47]}
         ];
 
         // Event listeners
-        fetchButton.addEventListener('click', loadSkins);
+        fetchButton.addEventListener('click', fetchSkinsByUsername);
         mergeButton.addEventListener('click', mergeSkins);
         downloadButton.addEventListener('click', downloadSkin);
         
-        // File input handlers
-        file1Input.addEventListener('change', () => handleFileUpload(file1Input, 1));
-        file2Input.addEventListener('change', () => handleFileUpload(file2Input, 2));
-
-        // Handle file upload
-        async function handleFileUpload(fileInput, skinNumber) {
-            const file = fileInput.files[0];
-            if (!file) return;
-
-            // Validate file type
-            if (!file.type.startsWith('image/png')) {
-                showMessage('Please upload a PNG image file', 'error');
-                fileInput.value = '';
-                return;
-            }
-
-            try {
-                const img = await loadImageFromFile(file);
-                
-                // Validate dimensions
-                if ((img.width !== 64) || (img.height !== 64 && img.height !== 32)) {
-                    showMessage('Skin must be 64x64 or 64x32 pixels', 'error');
-                    fileInput.value = '';
-                    return;
-                }
-
-                // Store and display
-                if (skinNumber === 1) {
-                    leftSkinImg = img;
-                    drawSkin(img, leftCanvas);
-                    leftStatus.textContent = `Loaded: ${file.name}`;
-                    username1Input.value = ''; // Clear username input
-                } else {
-                    rightSkinImg = img;
-                    drawSkin(img, rightCanvas);
-                    rightStatus.textContent = `Loaded: ${file.name}`;
-                    username2Input.value = ''; // Clear username input
-                }
-
-                // Enable merge if both skins loaded
-                if (leftSkinImg && rightSkinImg) {
-                    mergeButton.disabled = false;
-                    showMessage('Both skins loaded! Click "Merge Skins"', 'success');
-                }
-
-            } catch (error) {
-                showMessage('Error loading image: ' + error.message, 'error');
-                fileInput.value = '';
-            }
-        }
-
-        // Load image from file
-        function loadImageFromFile(file) {
-            return new Promise((resolve, reject) => {
-                const reader = new FileReader();
-                reader.onload = (e) => {
-                    const img = new Image();
-                    img.onload = () => resolve(img);
-                    img.onerror = () => reject(new Error('Failed to load image'));
-                    img.src = e.target.result;
-                };
-                reader.onerror = () => reject(new Error('Failed to read file'));
-                reader.readAsDataURL(file);
-            });
-        }
-        
-        // Load skins (username or file)
-        async function loadSkins() {
+        // Fetch skins by username
+        async function fetchSkinsByUsername() {
             const username1 = username1Input.value.trim();
             const username2 = username2Input.value.trim();
-            const hasFile1 = file1Input.files.length > 0;
-            const hasFile2 = file2Input.files.length > 0;
-
-            // Check if at least one input method is provided for each skin
-            if (!username1 && !hasFile1) {
-                showMessage('Please enter username or upload file for Skin 1', 'error');
+            
+            if (!username1 || !username2) {
+                showMessage('Please enter both usernames', 'error');
                 return;
             }
-            if (!username2 && !hasFile2) {
-                showMessage('Please enter username or upload file for Skin 2', 'error');
-                return;
-            }
-
-            showMessage('Loading skins...', 'loading');
+            
+            showMessage('Fetching skins...', 'loading');
             fetchButton.disabled = true;
             
             try {
-                // Load skin 1
-                if (!hasFile1 && username1) {
-                    leftStatus.textContent = 'Fetching...';
-                    leftSkinImg = await getSkinByUsername(username1);
-                    drawSkin(leftSkinImg, leftCanvas);
-                    leftStatus.textContent = `Loaded: ${username1}`;
-                }
+                leftStatus.textContent = 'Fetching...';
+                rightStatus.textContent = 'Fetching...';
                 
-                // Load skin 2
-                if (!hasFile2 && username2) {
-                    rightStatus.textContent = 'Fetching...';
-                    rightSkinImg = await getSkinByUsername(username2);
-                    drawSkin(rightSkinImg, rightCanvas);
-                    rightStatus.textContent = `Loaded: ${username2}`;
-                }
+                const [skin1, skin2] = await Promise.all([
+                    getSkinByUsername(username1),
+                    getSkinByUsername(username2)
+                ]);
+                
+                leftSkinImg = skin1;
+                rightSkinImg = skin2;
+                
+                drawSkin(leftSkinImg, leftCanvas);
+                drawSkin(rightSkinImg, rightCanvas);
+                
+                leftStatus.textContent = `Loaded: ${username1}`;
+                rightStatus.textContent = `Loaded: ${username2}`;
                 
                 showMessage('Skins loaded! Click "Merge Skins"', 'success');
                 mergeButton.disabled = false;
                 
             } catch (error) {
-                showMessage(error.message, 'error');
+                showMessage('Error: ' + error.message, 'error');
             } finally {
                 fetchButton.disabled = false;
             }
         }
         
-        // Get skin by username with fallback APIs
+        // Get skin by username
         async function getSkinByUsername(username) {
-            const apis = [
-                {
-                    name: 'Mojang',
-                    getUrl: async (username) => {
-                        try {
-                            // First get UUID from Mojang API
-                            const uuidResponse = await fetch(`https://api.mojang.com/users/profiles/minecraft/${encodeURIComponent(username)}`);
-                            if (!uuidResponse.ok) {
-                                if (uuidResponse.status === 404) {
-                                    throw new Error('Username not found');
-                                }
-                                throw new Error('Mojang API error');
-                            }
-                            const uuidData = await uuidResponse.json();
-                            
-                            // Then get profile data
-                            const profileResponse = await fetch(`https://sessionserver.mojang.com/session/minecraft/profile/${uuidData.id}`);
-                            if (!profileResponse.ok) throw new Error('Profile fetch failed');
-                            const profileData = await profileResponse.json();
-                            
-                            // Decode texture data with error handling
-                            const textureProperty = profileData.properties.find(p => p.name === 'textures');
-                            if (!textureProperty) throw new Error('No texture data');
-                            
-                            let textureData;
-                            try {
-                                textureData = JSON.parse(atob(textureProperty.value));
-                            } catch (e) {
-                                throw new Error('Invalid texture data format');
-                            }
-                            
-                            if (!textureData.textures || !textureData.textures.SKIN) {
-                                throw new Error('No skin texture');
-                            }
-                            return textureData.textures.SKIN.url;
-                        } catch (error) {
-                            // Handle CORS and network errors
-                            if (error.message.includes('CORS') || error.name === 'TypeError') {
-                                throw new Error('API blocked by CORS policy');
-                            }
-                            throw error;
-                        }
-                    }
-                },
-                {
-                    name: 'mc-heads.net',
-                    getUrl: (username) => `https://mc-heads.net/skin/${encodeURIComponent(username)}`
-                },
-                {
-                    name: 'Crafatar',
-                    getUrl: (username) => `https://crafatar.com/skins/${encodeURIComponent(username)}`
-                }
-            ];
-
-            let lastError = null;
-
-            for (const api of apis) {
-                try {
-                    const skinUrl = await api.getUrl(username);
-                    const img = await loadImage(skinUrl);
-                    return img;
-                } catch (error) {
-                    lastError = error;
-                    console.warn(`Failed to fetch from ${api.name}:`, error.message);
-                    continue;
-                }
-            }
-
-            // All APIs failed
-            const errorMsg = lastError?.message || 'Unknown error';
-            if (errorMsg.includes('Username not found') || errorMsg.includes('404')) {
-                throw new Error(`Username "${username}" not found. Please check the spelling.`);
-            } else if (errorMsg.includes('CORS') || errorMsg.includes('blocked')) {
-                throw new Error(`Unable to fetch skin for "${username}" due to API restrictions. Try uploading a file instead.`);
-            } else {
-                throw new Error(`Unable to fetch skin for "${username}". ${errorMsg}`);
+            try {
+                const skinUrl = `https://mc-heads.net/skin/${encodeURIComponent(username)}`;
+                return await loadImage(skinUrl);
+            } catch (error) {
+                throw new Error(`Failed to get skin for ${username}`);
             }
         }
         
@@ -852,7 +445,7 @@
                 const img = new Image();
                 img.crossOrigin = "Anonymous";
                 img.onload = () => resolve(img);
-                img.onerror = () => reject(new Error('Failed to load image from URL'));
+                img.onerror = () => reject(new Error('Failed to load image'));
                 img.src = src;
             });
         }
@@ -878,14 +471,7 @@
         
         function showMessage(text, type) {
             messageDiv.textContent = text;
-            messageDiv.className = `message-area ${type} show`;
-            
-            // Add spinner for loading messages
-            if (type === 'loading') {
-                const spinner = document.createElement('span');
-                spinner.className = 'spinner';
-                messageDiv.insertBefore(spinner, messageDiv.firstChild);
-            }
+            messageDiv.className = `message-area ${type}`;
         }
     </script>
 </body>
