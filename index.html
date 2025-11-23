@@ -705,15 +705,16 @@
             console.log(`[Skin Fetch] Starting fetch for username: ${username}`);
 
             // Prioritize CORS-friendly APIs first, then Mojang as fallback
+            // All getUrl functions are async and return a Promise<string> of the skin URL
             const apis = [
                 {
                     name: 'mc-heads.net',
-                    getUrl: (username) => `https://mc-heads.net/skin/${encodeURIComponent(username)}`,
+                    getUrl: async (username) => `https://mc-heads.net/skin/${encodeURIComponent(username)}`,
                     timeout: 5000
                 },
                 {
                     name: 'Crafatar',
-                    getUrl: (username) => `https://crafatar.com/skins/${encodeURIComponent(username)}`,
+                    getUrl: async (username) => `https://crafatar.com/skins/${encodeURIComponent(username)}`,
                     timeout: 5000
                 },
                 {
@@ -736,7 +737,7 @@
                 },
                 {
                     name: 'Minotar',
-                    getUrl: (username) => `https://minotar.net/skin/${encodeURIComponent(username)}`,
+                    getUrl: async (username) => `https://minotar.net/skin/${encodeURIComponent(username)}`,
                     timeout: 5000
                 },
                 {
@@ -856,6 +857,7 @@
             const errorMsg = lastError?.message || 'Unknown error';
             
             // Check if username was not found in any API
+            // If at least 3 APIs report "not found", the username likely doesn't exist
             const notFoundErrors = errors.filter(e => 
                 e.error.includes('404') || 
                 e.error.includes('not found') || 
