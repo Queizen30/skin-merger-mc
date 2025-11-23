@@ -700,7 +700,14 @@
             }
 
             // All APIs failed
-            throw new Error(`Unable to fetch skin for "${username}". ${lastError?.message || 'User may not exist or APIs are unavailable.'}`);
+            const errorMsg = lastError?.message || 'Unknown error';
+            if (errorMsg.includes('Username not found') || errorMsg.includes('404')) {
+                throw new Error(`Username "${username}" not found. Please check the spelling.`);
+            } else if (errorMsg.includes('CORS') || errorMsg.includes('blocked')) {
+                throw new Error(`Unable to fetch skin for "${username}" due to API restrictions. Try uploading a file instead.`);
+            } else {
+                throw new Error(`Unable to fetch skin for "${username}". ${errorMsg}`);
+            }
         }
         
         // Merge skins using coordinate ranges
