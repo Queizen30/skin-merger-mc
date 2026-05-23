@@ -675,26 +675,104 @@
             }
         }
         
+        // Helper function to add timeout to fetch requests
+        function fetchWithTimeout(url, timeout = 5000) {
+            let timeoutId;
+            const timeoutPromise = new Promise((_, reject) => {
+                timeoutId = setTimeout(() => reject(new Error('Request timeout')), timeout);
+            });
+            
+            return Promise.race([
+                fetch(url).finally(() => clearTimeout(timeoutId)),
+                timeoutPromise
+            ]);
+        }
+
+        // Validate username format
+        function isValidUsername(username) {
+            // Minecraft usernames: 3-16 characters, start with alphanumeric, then alphanumeric or underscore
+            return /^[a-zA-Z0-9][a-zA-Z0-9_]{2,15}$/.test(username);
+        }
+
         // Get skin by username with fallback APIs
         async function getSkinByUsername(username) {
+            // Validate username format
+            if (!isValidUsername(username)) {
+                throw new Error(`Invalid username format: "${username}". Must be 3-16 alphanumeric characters or underscores.`);
+            }
+
+            console.log(`[Skin Fetch] Starting fetch for username: ${username}`);
+
+            // Prioritize CORS-friendly APIs first, then Mojang as fallback
+            // All getUrl functions are async and return a Promise<string> of the skin URL
             const apis = [
                 {
-                    name: 'Mojang',
+                    name: 'mc-heads.net',
+                    getUrl: (username) => `https://mc-heads.net/skin/${encodeURIComponent(username)}`,
+                    timeout: 5000
+                },
+                {
+                    name: 'Crafatar',
+                    getUrl: (username) => `https://crafatar.com/skins/${encodeURIComponent(username)}`,
+                    timeout: 5000
+                },
+                {
+                    name: 'Minotar',
+                    getUrl: (username) => `https://minotar.net/skin/${encodeURIComponent(username)}`,
+                    timeout: 5000
+                },
+                {
+                    name: 'Mojang (via mc-heads proxy)',
+                    getUrl: async (username) => {
+                        const response = await fetchWithTimeout(
+                            `https://mc-heads.net/minecraft/profile/${encodeURIComponent(username)}`,
+                            8000
+                        );
+                        if (!response.ok) {
+                            throw new Error(`Profile API error: ${response.status}`);
+                        }
+                        const data = await response.json();
+                        if (data.properties && Array.isArray(data.properties) && data.properties.length > 0) {
+                            const textureProperty = data.properties.find(p => p && p.name === 'textures');
+                            if (textureProperty) {
+                                const textureData = JSON.parse(atob(textureProperty.value));
+                                if (textureData.textures && textureData.textures.SKIN) {
+                                    return textureData.textures.SKIN.url;
+                                }
+                            }
+                        }
+                        throw new Error('No skin texture in profile');
+                    },
+                    timeout: 8000
+                },
+                {
+                    name: 'Mojang Direct',
                     getUrl: async (username) => {
                         try {
+                            console.log(`[Mojang Direct] Fetching UUID for ${username}`);
                             // First get UUID from Mojang API
-                            const uuidResponse = await fetch(`https://api.mojang.com/users/profiles/minecraft/${encodeURIComponent(username)}`);
+                            const uuidResponse = await fetchWithTimeout(
+                                `https://api.mojang.com/users/profiles/minecraft/${encodeURIComponent(username)}`,
+                                8000
+                            );
+                            
                             if (!uuidResponse.ok) {
                                 if (uuidResponse.status === 404) {
                                     throw new Error('Username not found');
                                 }
-                                throw new Error('Mojang API error');
+                                throw new Error(`Mojang API error: ${uuidResponse.status}`);
                             }
                             const uuidData = await uuidResponse.json();
+                            console.log(`[Mojang Direct] Got UUID: ${uuidData.id}`);
                             
                             // Then get profile data
-                            const profileResponse = await fetch(`https://sessionserver.mojang.com/session/minecraft/profile/${uuidData.id}`);
-                            if (!profileResponse.ok) throw new Error('Profile fetch failed');
+                            const profileResponse = await fetchWithTimeout(
+                                `https://sessionserver.mojang.com/session/minecraft/profile/${uuidData.id}`,
+                                8000
+                            );
+                            if (!profileResponse.ok) {
+                                throw new Error(`Profile fetch failed: ${profileResponse.status}`);
+                            }
                             const profileData = await profileResponse.json();
                             
                             // Decode texture data with error handling
@@ -714,46 +792,94 @@
                             return textureData.textures.SKIN.url;
                         } catch (error) {
                             // Handle CORS and network errors
-                            if (error.message.includes('CORS') || error.name === 'TypeError') {
-                                throw new Error('API blocked by CORS policy');
+                            if (error.name === 'TypeError' && error.message.includes('fetch')) {
+                                throw new Error('CORS blocked or network error');
                             }
                             throw error;
                         }
-                    }
-                },
-                {
-                    name: 'mc-heads.net',
-                    getUrl: (username) => `https://mc-heads.net/skin/${encodeURIComponent(username)}`
-                },
-                {
-                    name: 'Crafatar',
-                    getUrl: (username) => `https://crafatar.com/skins/${encodeURIComponent(username)}`
+                    },
+                    timeout: 10000
                 }
             ];
 
             let lastError = null;
+            const errors = [];
+            // Threshold for determining if username doesn't exist
+            // Use 0.6 (60%) to be conservative - need clear majority before concluding username doesn't exist
+            const NOT_FOUND_THRESHOLD = 0.6;
 
             for (const api of apis) {
                 try {
+                    console.log(`[Skin Fetch] Trying ${api.name}...`);
+                    const startTime = Date.now();
+                    
                     const skinUrl = await api.getUrl(username);
-                    const img = await loadImage(skinUrl);
-                    return img;
+                    
+                    // Load the image with timeout and proper cleanup
+                    let timeoutId;
+                    const timeoutPromise = new Promise((_, reject) => {
+                        timeoutId = setTimeout(() => reject(new Error('Image load timeout')), api.timeout || 5000);
+                    });
+                    
+                    try {
+                        const img = await Promise.race([
+                            loadImage(skinUrl),
+                            timeoutPromise
+                        ]);
+                        clearTimeout(timeoutId);
+                        
+                        const elapsed = Date.now() - startTime;
+                        console.log(`[Skin Fetch] ✓ Success with ${api.name} (${elapsed}ms)`);
+                        return img;
+                    } catch (error) {
+                        clearTimeout(timeoutId);
+                        throw error;
+                    }
                 } catch (error) {
                     lastError = error;
-                    console.warn(`Failed to fetch from ${api.name}:`, error.message);
+                    const errorMsg = error.message || 'Unknown error';
+                    errors.push({ api: api.name, error: errorMsg });
+                    console.warn(`[Skin Fetch] ✗ ${api.name} failed:`, errorMsg);
                     continue;
                 }
             }
 
-            // All APIs failed
+            // All APIs failed - provide detailed error information
+            console.error(`[Skin Fetch] All APIs failed for "${username}":`, errors);
+            
             const errorMsg = lastError?.message || 'Unknown error';
-            if (errorMsg.includes('Username not found') || errorMsg.includes('404')) {
-                throw new Error(`Username "${username}" not found. Please check the spelling.`);
-            } else if (errorMsg.includes('CORS') || errorMsg.includes('blocked')) {
-                throw new Error(`Unable to fetch skin for "${username}" due to API restrictions. Try uploading a file instead.`);
-            } else {
-                throw new Error(`Unable to fetch skin for "${username}". ${errorMsg}`);
+            
+            // Check if username was not found in multiple APIs
+            // Use Math.ceil to ensure consistent percentage threshold across different API counts
+            // With 5 APIs and 0.6 threshold: ceil(3.0) = 3 APIs needed (60%)
+            // With 4 APIs and 0.6 threshold: ceil(2.4) = 3 APIs needed (75%)
+            const notFoundErrors = errors.filter(e => {
+                const errorLower = e.error.toLowerCase();
+                return errorLower.includes('404') || 
+                       errorLower.includes('not found') || 
+                       errorLower.includes('no skin');
+            });
+            
+            const notFoundThreshold = Math.ceil(apis.length * NOT_FOUND_THRESHOLD);
+            if (notFoundErrors.length >= notFoundThreshold) {
+                throw new Error(`Username "${username}" not found. Please verify the username exists.`);
             }
+            
+            // Check for CORS/network issues
+            const corsErrors = errors.filter(e => {
+                const errorLower = e.error.toLowerCase();
+                return errorLower.includes('cors') || 
+                       errorLower.includes('blocked') ||
+                       errorLower.includes('network') ||
+                       errorLower.includes('timeout');
+            });
+            
+            if (corsErrors.length === errors.length) {
+                throw new Error(`Unable to fetch skin for "${username}" due to network/CORS issues. Try uploading the skin file directly.`);
+            }
+            
+            // Generic error with details
+            throw new Error(`Unable to fetch skin for "${username}". Tried ${errors.length} APIs. Last error: ${errorMsg}`);
         }
         
         // Merge skins using coordinate ranges
